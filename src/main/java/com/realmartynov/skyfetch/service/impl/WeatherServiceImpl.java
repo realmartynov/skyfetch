@@ -1,21 +1,20 @@
 package com.realmartynov.skyfetch.service.impl;
 
 import com.realmartynov.skyfetch.service.WeatherService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.realmartynov.skyfetch.domain.Weather;
 import com.realmartynov.skyfetch.exception.InvalidCityNameException;
 import com.realmartynov.skyfetch.repository.WeatherRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
     private final WeatherRepository repository;
-
-    public WeatherServiceImpl(WeatherRepository repository) {
-        this.repository = repository;
-    }
 
     public Weather getOrGenerateWeather(String city) {
         validateCity(city);

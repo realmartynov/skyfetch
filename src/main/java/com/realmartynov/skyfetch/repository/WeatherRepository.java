@@ -12,10 +12,15 @@ import java.util.Optional;
 public class WeatherRepository {
 
     public static final String FIND_BY_CITY = "SELECT city, temperature, created_at, updated_at, last_access_datetime FROM weather WHERE LOWER(city) = LOWER(?)";
-    public static final String INSERT = "INSERT INTO weather (city, temperature, created_at, updated_at, last_access_datetime) VALUES (?, ?, now(), now(), now())";
-    public static final String UPDATE = "UPDATE weather SET temperature = ?, updated_at = now(), last_access_datetime = now() WHERE LOWER(city) = LOWER(?)";
-    public static final String EXISTS = "SELECT 1 FROM weather WHERE LOWER(city) = LOWER(?)";
     public static final String UPDATE_LAST_ACCESS = "UPDATE weather SET last_access_datetime = now() WHERE LOWER(city) = LOWER(?)";
+    public static final String UPSERT = """
+            INSERT INTO weather (city, temperature, created_at, updated_at, last_access_datetime)
+            VALUES (?, ?, now(), now(), now())
+            ON CONFLICT (city) DO UPDATE
+            SET temperature = EXCLUDED.temperature,
+                updated_at = now(),
+                last_access_datetime = now()
+            """;
 
     private final JdbcTemplate jdbc;
 
@@ -34,23 +39,7 @@ public class WeatherRepository {
     }
 
     public void save(Weather weather) {
-        if (exists(weather.getCity())) {
-            update(weather);
-        } else {
-            insert(weather);
-        }
-    }
-
-    private void insert(Weather weather) {
-        jdbc.update(INSERT, weather.getCity(), weather.getTemperature());
-    }
-
-    private void update(Weather weather) {
-        jdbc.update(UPDATE, weather.getTemperature(), weather.getCity());
-    }
-
-    public boolean exists(String city) {
-        return jdbc.query(EXISTS, new Object[]{city}, ResultSet::next);
+        jdbc.update(UPSERT, weather.getCity(), weather.getTemperature());
     }
 
     private void updateLastAccess(String city) {
