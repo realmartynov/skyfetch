@@ -1,21 +1,21 @@
 package com.realmartynov.skyfetch.controller;
 
-import com.realmartynov.skyfetch.domain.Weather;
+import com.realmartynov.skyfetch.dto.WeatherDto;
 import com.realmartynov.skyfetch.service.WeatherService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/weather")
+@RequestMapping("/weather")
 public class WeatherController {
 
-    private final WeatherService service;
+    private final WeatherService weatherService;
 
-    public WeatherController(WeatherService service) {
-        this.service = service;
+    public WeatherController(WeatherService weatherService) {
+        this.weatherService = weatherService;
     }
 
     @GetMapping("/{city}")
-    public Weather getWeatherByCity(@PathVariable String city) {
-        return service.getOrGenerateWeather(city);
+    public WeatherDto getWeatherByCity(@PathVariable String city) {
+        return weatherService.getOrGenerateWeather(city);
     }
 }
