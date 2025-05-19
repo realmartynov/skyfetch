@@ -1,32 +1,38 @@
 package com.realmartynov.skyfetch.service.impl;
 
+import com.realmartynov.skyfetch.dto.WeatherDto;
+import com.realmartynov.skyfetch.entity.WeatherEntity;
+import com.realmartynov.skyfetch.mapper.WeatherMapper;
 import com.realmartynov.skyfetch.service.WeatherService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.realmartynov.skyfetch.domain.Weather;
 import com.realmartynov.skyfetch.exception.InvalidCityNameException;
 import com.realmartynov.skyfetch.repository.WeatherRepository;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-@Service
 @RequiredArgsConstructor
+@Service
 public class WeatherServiceImpl implements WeatherService {
 
     private final WeatherRepository repository;
+    private final WeatherMapper mapper;
 
-    public Weather getOrGenerateWeather(String city) {
+    @Override
+    @Transactional
+    public WeatherDto getOrGenerateWeather(String city) {
         validateCity(city);
 
-        Optional<Weather> existing = repository.findByCity(city);
-        if (existing.isPresent())
-            return existing.get();
+        WeatherEntity entity = repository.findByCityIgnoreCase(city)
+                .map(repository::save)
+                .orElseGet(() -> {
+                    WeatherEntity newEntity = WeatherEntity.builder()
+                            .city(city)
+                            .temperature(generateRandomTemp())
+                            .build();
+                    return repository.save(newEntity);
+                });
 
-        double temperature = generateRandomTemp();
-        Weather newWeather = new Weather(city, temperature);
-        repository.save(newWeather);
-        return newWeather;
+        return mapper.toDto(entity);
     }
 
     private void validateCity(String city) {

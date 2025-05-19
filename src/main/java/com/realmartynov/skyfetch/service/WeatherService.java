@@ -1,7 +1,7 @@
 package com.realmartynov.skyfetch.service;
 
-import com.realmartynov.skyfetch.domain.Weather;
+import com.realmartynov.skyfetch.dto.WeatherDto;
 
 public interface WeatherService {
-    Weather getOrGenerateWeather(String city);
+    WeatherDto getOrGenerateWeather(String city);
 }
