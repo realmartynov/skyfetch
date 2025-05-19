@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.realmartynov.skyfetch.exception.InvalidCityNameException;
 import com.realmartynov.skyfetch.repository.WeatherRepository;
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -24,15 +23,11 @@ public class WeatherServiceImpl implements WeatherService {
         validateCity(city);
 
         WeatherEntity entity = repository.findByCityIgnoreCase(city)
-                .map(existing -> {
-                    existing.setLastAccessDatetime(LocalDateTime.now());
-                    return repository.save(existing);
-                })
+                .map(repository::save)
                 .orElseGet(() -> {
                     WeatherEntity newEntity = WeatherEntity.builder()
                             .city(city)
                             .temperature(generateRandomTemp())
-                            .lastAccessDatetime(LocalDateTime.now())
                             .build();
                     return repository.save(newEntity);
                 });

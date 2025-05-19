@@ -32,5 +32,6 @@ public class WeatherEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @UpdateTimestamp
     private LocalDateTime lastAccessDatetime;
 }
