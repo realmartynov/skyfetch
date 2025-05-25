@@ -1,46 +1,38 @@
 package com.realmartynov.skyfetch.service.impl;
 
-import com.realmartynov.skyfetch.dto.WeatherDto;
-import com.realmartynov.skyfetch.entity.WeatherEntity;
-import com.realmartynov.skyfetch.mapper.WeatherMapper;
-import com.realmartynov.skyfetch.service.WeatherService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.realmartynov.skyfetch.exception.InvalidCityNameException;
-import com.realmartynov.skyfetch.repository.WeatherRepository;
+import com.realmartynov.skyfetch.service.WeatherService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
-    private final WeatherRepository repository;
-    private final WeatherMapper mapper;
+    private final RestClient eolRestClient;
+
+    @Value("${app.cred.token}")
+    private String token;
 
     @Override
-    @Transactional
-    public WeatherDto getOrGenerateWeather(String city) {
-        validateCity(city);
-
-        WeatherEntity entity = repository.findByCityIgnoreCase(city)
-                .map(repository::save)
-                .orElseGet(() -> {
-                    WeatherEntity newEntity = WeatherEntity.builder()
-                            .city(city)
-                            .temperature(generateRandomTemp())
-                            .build();
-                    return repository.save(newEntity);
-                });
-
-        return mapper.toDto(entity);
+    public String getWeatherByCoordinateAndDate(String lon, String lat, String date) {
+        return eolRestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/weather/")
+                        .queryParam("lat", lat)
+                        .queryParam("lon", lon)
+                        .queryParam("date", date)
+                        .queryParam("token", token)
+                        .build())
+                .retrieve()
+                .body(String.class);
     }
+
 
     private void validateCity(String city) {
         if (!city.matches("^[А-Яа-яЁё\\-\\s]+$"))
             throw new InvalidCityNameException();
-    }
-
-    private double generateRandomTemp() {
-        return Math.random() * 200 - 100;
     }
 }
