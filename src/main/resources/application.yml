@@ -11,3 +11,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+app:
+  cred:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3OTg3NzYwLCJpYXQiOjE3NDc5ODc0NjAsImp0aSI6IjRmNWU3YTgzNDcxNjQ0MjA5Mzg5YTc3ZDU4MzU1MzdkIiwidXNlcl9pZCI6OTk2fQ.rv16A3_ZgKC91y2P9yTUqbJHaVQsq3WeKGAR1pOw7U0

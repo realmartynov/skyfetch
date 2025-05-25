@@ -1,7 +1,5 @@
 package com.realmartynov.skyfetch.service;
 
-import com.realmartynov.skyfetch.dto.WeatherDto;
-
 public interface WeatherService {
-    WeatherDto getOrGenerateWeather(String city);
+    String getWeatherByCoordinateAndDate(String lon, String lat, String date);
 }
